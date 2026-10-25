@@ -23,7 +23,19 @@ jobs:
             echo "$MSG"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+      - name: Validate Discord webhook configuration
+        id: validate
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [[ "$WEBHOOK_URL" =~ ^https://(discord\.com|discordapp\.com)/api/webhooks/[0-9]+/[^[:space:]]+$ ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::DISCORD_WEBHOOK_URL is missing or invalid; skipping the optional Discord notification."
+          fi
       - name: Send commit embed to Discord
+        if: ${{ steps.validate.outputs.enabled == 'true' }}
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
