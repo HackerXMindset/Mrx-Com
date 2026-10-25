@@ -313,6 +313,14 @@
 				<data android:host="kitsu-auth" />
 			</intent-filter>
 
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<!-- Exact registered Comick redirect URI. Keep this filter separate. -->
+				<data android:scheme="io.github.kotatsuredo.kotatsu" />
+				<data android:host="comick-auth" />
+			</intent-filter>
 		</activity>
 		<activity
 			android:name="org.koitharu.kotatsu.settings.sources.catalog.SourcesCatalogActivity"
