@@ -12,6 +12,9 @@ interface ScrobblerRepository {
 
 	val cachedUser: ScrobblerUser?
 
+	/** Verifies OAuth state for providers that use CSRF protection. */
+	fun verifyOAuthState(state: String?): Boolean = true
+
 	suspend fun authorize(code: String?)
 
 	suspend fun loadUser(): ScrobblerUser
