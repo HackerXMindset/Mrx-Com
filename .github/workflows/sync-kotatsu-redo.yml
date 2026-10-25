@@ -1,0 +1,43 @@
+name: Sync Kotatsu-Redo upstream
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kotatsu-redo-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out MRX
+        uses: actions/checkout@v4
+        with:
+          ref: devel
+          fetch-depth: 0
+
+      - name: Configure bot identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch Kotatsu-Redo
+        run: |
+          git remote add upstream https://github.com/Kotatsu-Redo/Kotatsu-Redo.git
+          git fetch upstream devel:refs/remotes/upstream/devel
+
+      - name: Merge upstream changes
+        run: git merge --no-edit --no-ff upstream/devel
+
+      - name: Push updated MRX branch
+        run: git push origin HEAD:devel
+
+# The job intentionally stops on merge conflicts and does not force-push.
+# Run it manually from Actions → Sync Kotatsu-Redo upstream → Run workflow.
