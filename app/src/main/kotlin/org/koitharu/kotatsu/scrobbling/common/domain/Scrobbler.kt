@@ -54,6 +54,8 @@ abstract class Scrobbler(
 	val isEnabled: Boolean
 		get() = repository.isAuthorized
 
+	fun verifyOAuthState(state: String?): Boolean = repository.verifyOAuthState(state)
+
 	suspend fun authorize(authCode: String): ScrobblerUser {
 		repository.authorize(authCode)
 		return repository.loadUser()
