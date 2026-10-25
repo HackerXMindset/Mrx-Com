@@ -1,6 +1,7 @@
 package org.koitharu.kotatsu.scrobbling.comick.data
 
 import android.content.Context
+import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +20,7 @@ import org.koitharu.kotatsu.parsers.util.await
 import org.koitharu.kotatsu.parsers.util.json.getStringOrNull
 import org.koitharu.kotatsu.scrobbling.comick.asHidToLong
 import org.koitharu.kotatsu.scrobbling.comick.comickStatus
+import org.koitharu.kotatsu.scrobbling.comick.COMICK_TOKEN_EXPIRY_KEY
 import org.koitharu.kotatsu.scrobbling.comick.toHid
 import org.koitharu.kotatsu.scrobbling.common.data.ScrobblerRepository
 import org.koitharu.kotatsu.scrobbling.common.data.ScrobblerStorage
@@ -30,7 +32,6 @@ import org.koitharu.kotatsu.scrobbling.common.domain.model.ScrobblerType
 import org.koitharu.kotatsu.scrobbling.common.domain.model.ScrobblerUser
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,7 +39,6 @@ private const val OAUTH_BASE_URL = "https://comick.dev/api/auth/oauth2"
 private const val API_BASE_URL = "https://api.comick.dev/integrations/v1"
 private const val REDIRECT_URI = "io.github.kotatsuredo.kotatsu://comick-auth"
 private const val COMICK_SCOPE = "library:read library:write offline_access"
-private const val TOKEN_EXPIRY_KEY = "comick_expires_at"
 private const val OAUTH_STATE_KEY = "comick_oauth_state"
 private const val CODE_VERIFIER_KEY = "comick_code_verifier"
 private const val CLIENT_ID_PLACEHOLDER = "REPLACE_WITH_COMICK_OAUTH_CLIENT_ID"
@@ -70,8 +70,9 @@ class ComickRepository @Inject constructor(
 			val verifier = randomUrlSafe(32)
 			storage[OAUTH_STATE_KEY] = state
 			storage[CODE_VERIFIER_KEY] = verifier
-			val challenge = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(
+			val challenge = Base64.encodeToString(
 				MessageDigest.getInstance("SHA-256").digest(verifier.toByteArray(Charsets.US_ASCII)),
+				Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING,
 			)
 			return "$OAUTH_BASE_URL/authorize".toHttpUrl().newBuilder()
 				.addQueryParameter("response_type", "code")
@@ -139,7 +140,7 @@ class ComickRepository @Inject constructor(
 
 		storage.accessToken = accessToken
 		storage.refreshToken = refreshToken
-		storage[TOKEN_EXPIRY_KEY] = expiresAt.toString()
+		storage[COMICK_TOKEN_EXPIRY_KEY] = expiresAt.toString()
 		storage["comick_scope"] = scope
 		storage[CODE_VERIFIER_KEY] = null
 		storage[OAUTH_STATE_KEY] = null
@@ -371,6 +372,6 @@ class ComickRepository @Inject constructor(
 	private fun randomUrlSafe(byteCount: Int): String {
 		val bytes = ByteArray(byteCount)
 		SecureRandom().nextBytes(bytes)
-		return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+		return Base64.encodeToString(bytes, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
 	}
 }
