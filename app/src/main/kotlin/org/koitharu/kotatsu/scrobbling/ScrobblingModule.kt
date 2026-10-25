@@ -76,6 +76,7 @@ object ScrobblingModule {
 
 	@Provides
 	@Singleton
+	@ScrobblerType(ScrobblerService.COMICK)
 	fun provideComickHttpClient(
 		@BaseHttpClient baseHttpClient: OkHttpClient,
 		interceptor: ComickInterceptor,
