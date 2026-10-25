@@ -56,8 +56,9 @@ class ScrobblerConfigViewModel @Inject constructor(
 			.launchIn(viewModelScope + Dispatchers.Default)
 	}
 
-	fun onAuthCodeReceived(authCode: String) {
+	fun onAuthCodeReceived(authCode: String, state: String? = null) {
 		launchLoadingJob(Dispatchers.Default) {
+			check(scrobbler.verifyOAuthState(state)) { "Comick OAuth state verification failed. Please restart sign-in." }
 			val newUser = scrobbler.authorize(authCode)
 			user.value = newUser
 		}
@@ -109,6 +110,7 @@ class ScrobblerConfigViewModel @Inject constructor(
 			ScrobblerConfigActivity.HOST_ANILIST_AUTH -> ScrobblerService.ANILIST
 			ScrobblerConfigActivity.HOST_MAL_AUTH -> ScrobblerService.MAL
 			ScrobblerConfigActivity.HOST_KITSU_AUTH -> ScrobblerService.KITSU
+			ScrobblerConfigActivity.HOST_COMICK_AUTH -> ScrobblerService.COMICK
 			else -> error("Wrong scrobbler uri: $uri")
 		}
 	}
