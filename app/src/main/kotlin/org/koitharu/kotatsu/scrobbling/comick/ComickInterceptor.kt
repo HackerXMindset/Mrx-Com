@@ -81,7 +81,8 @@ class ComickInterceptor @Inject constructor(
 				val newAccessToken = json.optString("access_token").takeIf { value -> value.isNotBlank() }
 					?: throw IOException("Comick returned no access token during refresh")
 				val newRefreshToken = json.optString("refresh_token").takeIf { value -> value.isNotBlank() } ?: refreshToken
-				val expiresAt = json.optLong("expires_at", 0L)
+				val expiresAt = json.optLong("expires_at", 0L).takeIf { it > 0L }
+					?: (System.currentTimeMillis() / 1000L + json.optLong("expires_in", 0L))
 				if (expiresAt <= 0L) throw IOException("Comick returned an invalid token expiry")
 
 				storage.accessToken = newAccessToken
