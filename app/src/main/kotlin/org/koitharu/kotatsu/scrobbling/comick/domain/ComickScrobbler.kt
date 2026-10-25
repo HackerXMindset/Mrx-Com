@@ -26,8 +26,6 @@ class ComickScrobbler @Inject constructor(
 		statuses[ScrobblingStatus.DROPPED] = "4"
 	}
 
-	override fun verifyOAuthState(state: String?): Boolean = repository.verifyOAuthState(state)
-
 	override suspend fun updateScrobblingInfo(
 		mangaId: Long,
 		rating: Float,
