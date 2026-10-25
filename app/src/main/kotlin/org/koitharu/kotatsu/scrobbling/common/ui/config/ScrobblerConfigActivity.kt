@@ -95,7 +95,7 @@ class ScrobblerConfigActivity : BaseActivity<ActivityScrobblerConfigBinding>(),
 			val uri = intent.data ?: return
 			val code = uri.getQueryParameter("code")
 			if (!code.isNullOrEmpty()) {
-				viewModel.onAuthCodeReceived(code)
+				viewModel.onAuthCodeReceived(code, uri.getQueryParameter("state"))
 			}
 		}
 	}
@@ -128,5 +128,6 @@ class ScrobblerConfigActivity : BaseActivity<ActivityScrobblerConfigBinding>(),
 		const val HOST_ANILIST_AUTH = "anilist-auth"
 		const val HOST_MAL_AUTH = "mal-auth"
 		const val HOST_KITSU_AUTH = "kitsu-auth"
+		const val HOST_COMICK_AUTH = "comick-auth"
 	}
 }
