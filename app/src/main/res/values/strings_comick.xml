@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="comick" translatable="false">Comick</string>
+    <!-- Register a Comick OAuth app and replace this value with its public client ID.
+         Redirect URI: io.github.kotatsuredo.kotatsu://comick-auth -->
+    <string name="comick_clientId" translatable="false">REPLACE_WITH_COMICK_OAUTH_CLIENT_ID</string>
+</resources>

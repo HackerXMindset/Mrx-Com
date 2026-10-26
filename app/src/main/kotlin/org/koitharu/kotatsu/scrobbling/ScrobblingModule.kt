@@ -12,6 +12,9 @@ import org.koitharu.kotatsu.BuildConfig
 import org.koitharu.kotatsu.core.db.MangaDatabase
 import org.koitharu.kotatsu.core.network.BaseHttpClient
 import org.koitharu.kotatsu.core.network.CurlLoggingInterceptor
+import org.koitharu.kotatsu.scrobbling.comick.ComickInterceptor
+import org.koitharu.kotatsu.scrobbling.comick.data.ComickRepository
+import org.koitharu.kotatsu.scrobbling.comick.domain.ComickScrobbler
 import org.koitharu.kotatsu.scrobbling.anilist.data.AniListAuthenticator
 import org.koitharu.kotatsu.scrobbling.anilist.data.AniListInterceptor
 import org.koitharu.kotatsu.scrobbling.anilist.domain.AniListScrobbler
@@ -73,6 +76,23 @@ object ScrobblingModule {
 
 	@Provides
 	@Singleton
+	@ScrobblerType(ScrobblerService.COMICK)
+	fun provideComickHttpClient(
+		@BaseHttpClient baseHttpClient: OkHttpClient,
+		interceptor: ComickInterceptor,
+	): OkHttpClient = baseHttpClient.newBuilder()
+		.addInterceptor(interceptor)
+		.build()
+
+	@Provides
+	@Singleton
+	@ScrobblerType(ScrobblerService.COMICK)
+	fun provideComickStorage(
+		@ApplicationContext context: Context,
+	): ScrobblerStorage = ScrobblerStorage(context, ScrobblerService.COMICK)
+
+	@Provides
+	@Singleton
 	fun provideKitsuRepository(
 		@ApplicationContext context: Context,
 		@ScrobblerType(ScrobblerService.KITSU) storage: ScrobblerStorage,
@@ -123,6 +143,13 @@ object ScrobblingModule {
 		shikimoriScrobbler: ShikimoriScrobbler,
 		aniListScrobbler: AniListScrobbler,
 		malScrobbler: MALScrobbler,
-		kitsuScrobbler: KitsuScrobbler
-	): Set<@JvmSuppressWildcards Scrobbler> = setOf(shikimoriScrobbler, aniListScrobbler, malScrobbler, kitsuScrobbler)
+		kitsuScrobbler: KitsuScrobbler,
+		comickScrobbler: ComickScrobbler,
+	): Set<@JvmSuppressWildcards Scrobbler> = setOf(
+		shikimoriScrobbler,
+		aniListScrobbler,
+		malScrobbler,
+		kitsuScrobbler,
+		comickScrobbler,
+	)
 }
