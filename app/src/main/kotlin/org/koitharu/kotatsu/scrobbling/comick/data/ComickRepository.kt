@@ -209,7 +209,7 @@ class ComickRepository @Inject constructor(
 		return ScrobblerMangaInfo(
 			id = hid.asHidToLong(),
 			name = json.getString("title"),
-			cover = json.getStringOrNull("cover_url").orEmpty(),
+			cover = json.optString("cover_url", ""),
 			url = json.getStringOrNull("url") ?: "https://comick.dev/comic/$hid",
 			descriptionHtml = json.getStringOrNull("description").orEmpty(),
 		)
